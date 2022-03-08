@@ -66,5 +66,13 @@
    cd tchemExampleBuild
    
    cmake -B . -S ../tchemExample -DTChem_DIR=$TCHEM_DIR/lib64/cmake/TChem -DTines_DIR=$TINES_DIR/lib64/cmake/Tines -DKokkos_DIR=$KOKKOS_DIR/lib64/cmake/Kokkos
-      
+   ``` 
+     
+6. Running the example
+   ```bash
+   # Using grimech
+   ./exe --inputs-path=$TCHEM_DIR/example/data/ignition-zero-d/gri3.0/ --use-prefix-path=true
    
+   # using custom yaml
+   ./exe  --yamlFile=../tchemExample/inputs/LL2KGB_AllRange.yaml 
+   ```
