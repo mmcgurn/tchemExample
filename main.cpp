@@ -46,7 +46,8 @@ using time_advance_type_1d_view_host = TChem::time_advance_type_1d_view_host;
 // #define TCHEM_EXAMPLE_IGNITIONZEROD_QOI_PRINT
 
 int
-main(int argc, char *argv[]) {
+main(int argc, char* argv[])
+{
 
     /// default inputs
     std::string prefixPath("data/ignition-zero-d/gri3.0/");
@@ -69,11 +70,10 @@ main(int argc, char *argv[]) {
 #if defined(TINES_ENABLE_TPL_SUNDIALS)
     bool use_cvode(false);
 #endif
-    std::string yamlFile("/Users/mcgurn/scratch/ablateInputs/ignitionDelay_n-Pentane/LL2KGB_AllRange.yaml");
-
-    std::string chemFile(prefixPath + "chem.inp");
-    std::string thermFile(prefixPath + "therm.dat");
-    std::string inputFile("/Users/mcgurn/scratch/tchemv2/test/inputs/sample.dat");
+    std::string chemFile(prefixPath+"chem.inp");
+    std::string thermFile(prefixPath+"therm.dat");
+    std::string inputFile(prefixPath+"sample.dat");
+    std::string yamlFile;
     std::string outputFile("IgnSolution.dat");
     std::string ignition_delay_time_file("IgnitionDelayTime.dat");
     std::string ignition_delay_time_w_threshold_temperature_file("IgnitionDelayTimeTthreshold.dat");
@@ -85,8 +85,9 @@ main(int argc, char *argv[]) {
     opts.set_option<std::string>("inputs-path", "path to input files e.g., data/inputs", &prefixPath);
     opts.set_option<bool>("use-prefix-path", "If true, input file are at the prefix path", &use_prefixPath);
 
-    opts.set_option<std::string>("chemfile", "Chem file name e.g., chem.inp", &chemFile);
+    opts.set_option<std::string>("chemfile", "Chem file name e.g., chem.inp",&chemFile);
     opts.set_option<std::string>("thermfile", "Therm file namee.g., therm.dat", &thermFile);
+    opts.set_option<std::string>("yamlFile", "Therm yamlFile input file e.g., therm.yaml", &yamlFile);
     opts.set_option<std::string>("samplefile", "Input state file name e.g.,input.dat", &inputFile);
     opts.set_option<real_type>("tbeg", "Time begin", &tbeg);
     opts.set_option<real_type>("tend", "Time end", &tend);
@@ -95,13 +96,12 @@ main(int argc, char *argv[]) {
     opts.set_option<real_type>("atol-newton", "Absolute tolerance used in newton solver", &atol_newton);
     opts.set_option<real_type>("rtol-newton", "Relative tolerance used in newton solver", &rtol_newton);
     opts.set_option<bool>("run-constant-pressure",
-                          "if true code runs ignition zero d reactor; else code runs constant volume ignition reactor",
-                          &run_ignition_zero_d);
+                          "if true code runs ignition zero d reactor; else code runs constant volume ignition reactor", &run_ignition_zero_d);
 
 #if defined(TINES_ENABLE_TPL_SUNDIALS)
     opts.set_option<bool>("use-cvode",
-            "if true code runs ignition zero d reactor with cvode; otherwise, it uses TrBDF2",
-            &use_cvode);
+			"if true code runs ignition zero d reactor with cvode; otherwise, it uses TrBDF2",
+			&use_cvode);
 #endif
     opts.set_option<std::string>("outputfile",
                                  "Output file name e.g., IgnSolution.dat", &outputFile);
@@ -144,24 +144,24 @@ main(int argc, char *argv[]) {
 
     // if ones wants to all the input files in one directory,
     //and do not want give all names
-    if (use_prefixPath) {
-        chemFile = prefixPath + "chem.inp";
-        thermFile = prefixPath + "therm.dat";
-        inputFile = prefixPath + "sample.dat";
+    if ( use_prefixPath ){
+        chemFile      = prefixPath + "chem.inp";
+        thermFile     = prefixPath + "therm.dat";
+        inputFile     = prefixPath + "sample.dat";
 
-        printf("Using a prefix path %s \n", prefixPath.c_str());
+        printf("Using a prefix path %s \n",prefixPath.c_str() );
     }
 
     Kokkos::initialize(argc, argv);
     {
         printf("----------------------------------------------------- \n");
         printf("---------------------WARNING------------------------- \n");
-        if (run_ignition_zero_d) {
+        if (run_ignition_zero_d){
 #if defined(TINES_ENABLE_TPL_SUNDIALS)
             if (use_cvode) {
-    printf("   TChem is running Ignition Zero D Reactor CVODE\n");
+	printf("   TChem is running Ignition Zero D Reactor CVODE\n");
       } else {
-    printf("   TChem is running Ignition Zero D Reactor with TrBDF2 \n");
+	printf("   TChem is running Ignition Zero D Reactor with TrBDF2 \n");
       }
 #else
             printf("   TChem is running Ignition Zero D Reactor with TrBDF2 \n");
@@ -187,11 +187,17 @@ main(int argc, char *argv[]) {
 
         TChem::exec_space::print_configuration(std::cout, detail);
         TChem::host_exec_space::print_configuration(std::cout, detail);
-        using device_type = typename Tines::UseThisDevice<exec_space>::type;
-        using host_device_type = typename Tines::UseThisDevice<host_exec_space>::type;
+        using device_type      = typename Tines::UseThisDevice<exec_space>::type;
+        using host_device_type      = typename Tines::UseThisDevice<host_exec_space>::type;
 
         /// construct kmd and use the view for testing
-        TChem::KineticModelData kmd(yamlFile);
+        TChem::KineticModelData kmd;
+        if(yamlFile.empty()){
+            kmd = TChem::KineticModelData(chemFile, thermFile);
+        }else{
+            kmd = TChem::KineticModelData(yamlFile);
+        }
+
         const TChem::KineticModelConstData<device_type> kmcd =
                 TChem::createGasKineticModelConstData<device_type>(kmd);
         const auto kmcd_host = TChem::createGasKineticModelConstData<host_device_type>(kmd);
@@ -202,7 +208,7 @@ main(int argc, char *argv[]) {
         printf("Number of Species %d \n", kmcd.nSpec);
         printf("Number of Reactions %d \n", kmcd.nReac);
 
-        FILE *fout;
+        FILE* fout;
         if (!OnlyComputeIgnDelayTime) {
             fout = fopen(outputFile.c_str(), "w");
         }
@@ -215,7 +221,7 @@ main(int argc, char *argv[]) {
         int nBatch(0);
         {
             // get species molecular weigths
-            const auto SpeciesMolecularWeights = kmcd_host.sMass;
+            const auto SpeciesMolecularWeights =kmcd_host.sMass;
             TChem::Test::readSample(inputFile,
                                     speciesNamesHost,
                                     SpeciesMolecularWeights,
@@ -240,8 +246,8 @@ main(int argc, char *argv[]) {
         auto kmds = kmd.clone(nBatch);
         auto kmcds = TChem::createGasKineticModelConstData<device_type>(kmds);
 
-        using time_integrator_cvode_type = Tines::TimeIntegratorCVODE<real_type, device_type>;
-        Tines::value_type_1d_view<time_integrator_cvode_type, device_type> cvodes;
+        using time_integrator_cvode_type = Tines::TimeIntegratorCVODE<real_type,device_type>;
+        Tines::value_type_1d_view<time_integrator_cvode_type,device_type> cvodes;
 
 #if defined(TINES_ENABLE_TPL_SUNDIALS)
         if (use_cvode) {
@@ -254,7 +260,7 @@ main(int argc, char *argv[]) {
         // make ingition delay negative
         Kokkos::parallel_for(
                 Kokkos::RangePolicy<TChem::exec_space>(0, nBatch),
-                KOKKOS_LAMBDA(const ordinal_type &i) {
+                KOKKOS_LAMBDA(const ordinal_type& i) {
                     IgnDelayTimes(i) = -1;
                     IgnDelayTimesT(i) = -1;
                 });
@@ -280,14 +286,14 @@ main(int argc, char *argv[]) {
     }
 
     Kokkos::parallel_for(
-             Kokkos::RangePolicy<TChem::exec_space>(0, nBatch),
-             KOKKOS_LAMBDA(const ordinal_type& i) {
-               printf("Devices::Initial condition sample No %d\n", i);
-               auto state_at_i = Kokkos::subview(state, i, Kokkos::ALL());
-               for (ordinal_type k = 0, kend = state_at_i.extent(0); k < kend; ++k)
-                 printf(" %e", state_at_i(k));
-               printf("\n");
-             });
+			 Kokkos::RangePolicy<TChem::exec_space>(0, nBatch),
+			 KOKKOS_LAMBDA(const ordinal_type& i) {
+			   printf("Devices::Initial condition sample No %d\n", i);
+			   auto state_at_i = Kokkos::subview(state, i, Kokkos::ALL());
+			   for (ordinal_type k = 0, kend = state_at_i.extent(0); k < kend; ++k)
+			     printf(" %e", state_at_i(k));
+			   printf("\n");
+			 });
 
 #endif
 
@@ -297,7 +303,7 @@ main(int argc, char *argv[]) {
                              const real_type_1d_view_host _t,
                              const real_type_1d_view_host _dt,
                              const real_type_2d_view_host _state_at_i,
-                             FILE *fout) { // sample, time, density, pressure,
+                             FILE* fout) { // sample, time, density, pressure,
             // temperature, mass fraction
             for (size_t sp = 0; sp < _state_at_i.extent(0); sp++) {
                 fprintf(fout, "%d \t %15.10e \t  %15.10e \t ", iter, _t(sp), _dt(sp));
@@ -342,7 +348,7 @@ main(int argc, char *argv[]) {
             }
 
             ordinal_type number_of_equations(0);
-            if (run_ignition_zero_d) {
+            if (run_ignition_zero_d){
                 using problem_type = TChem::Impl::IgnitionZeroD_Problem<real_type, device_type>;
                 number_of_equations = problem_type::getNumberOfTimeODEs(kmcd);
             } else {
@@ -460,17 +466,17 @@ main(int argc, char *argv[]) {
                 }
 
                 real_type tsum(0);
-                for (; iter < max_num_time_iterations && tsum <= tend * 0.9999; ++iter) {
+                for (; iter < max_num_time_iterations && tsum <= tend*0.9999; ++iter) {
 
-                    if (run_ignition_zero_d) {
+                    if (run_ignition_zero_d){
 #if defined(TINES_ENABLE_TPL_SUNDIALS)
                         if (use_cvode) {
-          TChem::IgnitionZeroD::runHostBatchCVODE
-        (policy, tol_time, fac, tadv, state, t, dt, state, kmcds, cvodes);
-        } else {
-          TChem::IgnitionZeroD::runDeviceBatch
-        (policy, tol_newton, tol_time, fac, tadv, state, t, dt, state, kmcds);
-        }
+	      TChem::IgnitionZeroD::runHostBatchCVODE
+		(policy, tol_time, fac, tadv, state, t, dt, state, kmcds, cvodes);
+	    } else {
+	      TChem::IgnitionZeroD::runDeviceBatch
+		(policy, tol_newton, tol_time, fac, tadv, state, t, dt, state, kmcds);
+	    }
 #else
                         TChem::IgnitionZeroD::runDeviceBatch
                                 (policy, tol_newton, tol_time, fac, tadv, state, t, dt, state, kmcds);
@@ -485,7 +491,7 @@ main(int argc, char *argv[]) {
 
                     Kokkos::parallel_for
                             (Kokkos::RangePolicy<TChem::exec_space>(0, nBatch),
-                             KOKKOS_LAMBDA(const ordinal_type &i) {
+                             KOKKOS_LAMBDA(const ordinal_type& i) {
                                  if (IgnDelayTimesT(i) < 0 && state(i, 2) >= T_threshold) {
                                      IgnDelayTimesT(i) = t(i);
 
@@ -499,7 +505,7 @@ main(int argc, char *argv[]) {
                     ///* Ignition delay time - second derivative */
                     Kokkos::parallel_for
                             (Kokkos::RangePolicy<TChem::exec_space>(0, nBatch),
-                             KOKKOS_LAMBDA(const ordinal_type &i) {
+                             KOKKOS_LAMBDA(const ordinal_type& i) {
                                  if (IgnDelayTimes(i) <= 0) {
                                      const real_type temp_at_i = state(i, 2);
                                      // dTdt at i-3/2
@@ -556,7 +562,7 @@ main(int argc, char *argv[]) {
                     tsum = zero;
                     Kokkos::parallel_reduce(
                             Kokkos::RangePolicy<TChem::exec_space>(0, nBatch),
-                            KOKKOS_LAMBDA(const ordinal_type &i, real_type &update) {
+                            KOKKOS_LAMBDA(const ordinal_type& i, real_type& update) {
                                 tadv(i)._tbeg = t(i);
                                 tadv(i)._dt = dt(i);
                                 // printf("t %e, dt %e\n", t(i), dt(i));
@@ -579,14 +585,14 @@ main(int argc, char *argv[]) {
 
 #if defined(TCHEM_EXAMPLE_IGNITIONZEROD_QOI_PRINT)
         Kokkos::parallel_for(
-             Kokkos::RangePolicy<TChem::exec_space>(0, nBatch),
-             KOKKOS_LAMBDA(const ordinal_type& i) {
-               printf("Devices:: Solution sample No %d\n", i);
-               auto state_at_i = Kokkos::subview(state, i, Kokkos::ALL());
-               for (ordinal_type k = 0, kend = state_at_i.extent(0); k < kend; ++k)
-                 printf(" %e", state_at_i(k));
-               printf("\n");
-             });
+			 Kokkos::RangePolicy<TChem::exec_space>(0, nBatch),
+			 KOKKOS_LAMBDA(const ordinal_type& i) {
+			   printf("Devices:: Solution sample No %d\n", i);
+			   auto state_at_i = Kokkos::subview(state, i, Kokkos::ALL());
+			   for (ordinal_type k = 0, kend = state_at_i.extent(0); k < kend; ++k)
+			     printf(" %e", state_at_i(k));
+			   printf("\n");
+			 });
 #endif
 
 

@@ -9,11 +9,11 @@
 
   ```bash
   
-  module purge; module load chrest/ccr gtest openblas/release kokkos/release tines/release tchem/release
+  module purge; module load chrest/ccr yaml-cpp gtest openblas/release kokkos/release tines/release tchem/release
   
   or
   
-  module purge; module load chrest/ccr gtest openblas/debug kokkos/debug tines/debug tchem/debug
+  module purge; module load chrest/ccr yaml-cpp gtest openblas/debug kokkos/debug tines/debug tchem/debug
   
   
   ```
@@ -65,8 +65,6 @@
    mkdir tchemExampleBuilt
    cd tchemExampleBuild
    
-   cmake -B . -S ../tchemExample -DTChem_DIR=$TCHEM_DIR/lib64/cmake/TChem
--DTines_DIR=/Users/mcgurn/scratch/tchemv2/install/Tines/lib/cmake/Tines
--DKokkos_DIR=/Users/mcgurn/scratch/tchemv2/install/kokkos/lib/cmake/Kokkos
+   cmake -B . -S ../tchemExample -DTChem_DIR=$TCHEM_DIR/lib64/cmake/TChem -DTines_DIR=$TINES_DIR/lib64/cmake/Tines -DKokkos_DIR=$KOKKOS_DIR/lib64/cmake/Kokkos
       
    
