@@ -191,7 +191,7 @@ main(int argc, char *argv[]) {
         using host_device_type = typename Tines::UseThisDevice<host_exec_space>::type;
 
         /// construct kmd and use the view for testing
-        TChem::KineticModelData kmd(yamlFile, yamlFile);
+        TChem::KineticModelData kmd(yamlFile);
         const TChem::KineticModelConstData<device_type> kmcd =
                 TChem::createGasKineticModelConstData<device_type>(kmd);
         const auto kmcd_host = TChem::createGasKineticModelConstData<host_device_type>(kmd);
