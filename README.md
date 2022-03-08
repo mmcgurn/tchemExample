@@ -38,11 +38,11 @@
 
   ```bash
   
-  module purge; module load chrest/ccr gtest openblas/release kokkos/release tines/release tchem/release
+  module purge; module load chrest/ccr yaml-cpp gtest openblas/release kokkos/release tines/release tchem/release
   
   or
   
-  module purge; module load chrest/ccr gtest openblas/debug kokkos/debug tines/debug tchem/debug
+  module purge; module load chrest/ccr yaml-cpp gtest openblas/debug kokkos/debug tines/debug tchem/debug
   
   
   ```
@@ -52,17 +52,12 @@
    ```bash
    git clone https://github.com/mmcgurn/tchemExample.git
    ```
-   
-4. Setup env   
-   ```bash
-   
-   ```
-   
+
 5. Setup/build exe
    ```bash
    module load cmake 
    
-   mkdir tchemExampleBuilt
+   mkdir tchemExampleBuild
    cd tchemExampleBuild
    
    cmake -B . -S ../tchemExample -DTChem_DIR=$TCHEM_DIR/lib64/cmake/TChem -DTines_DIR=$TINES_DIR/lib64/cmake/Tines -DKokkos_DIR=$KOKKOS_DIR/lib64/cmake/Kokkos
@@ -74,5 +69,5 @@
    ./exe --inputs-path=$TCHEM_DIR/example/data/ignition-zero-d/gri3.0/ --use-prefix-path=true
    
    # using custom yaml
-   ./exe  --yamlFile=../tchemExample/inputs/LL2KGB_AllRange.yaml 
+   ./exe  --yamlFile=../tchemExample/inputs/LL2KGB_AllRange.yaml --samplefile=../tchemExample/inputs/sample.dat
    ```
