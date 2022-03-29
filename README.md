@@ -4,6 +4,7 @@
 
 1. Ssh onto CCR
 
+1. Load the project modules ```module use /projects/academic/chrest/modules/```
 
 2. Load the required modules
 
