@@ -9,11 +9,11 @@
 
   ```bash
   
-  module purge; module load chrest/ccr cmake/3.17.1 yaml-cpp gtest openblas/release kokkos/release tines/release tchem/release
+  module purge; module load chrest/ccr intel-mpi/2020.2 intel/20.2 cmake/3.17.1 yaml-cpp gtest openblas/release kokkos/release tines/release tchem/release
   
   or
   
-  module purge; module load chrest/ccr cmake/3.17.1 yaml-cpp gtest openblas/debug kokkos/debug tines/debug tchem/debug
+  module purge; module load chrest/ccr intel-mpi/2020.2 intel/20.2 cmake/3.17.1 yaml-cpp gtest openblas/debug kokkos/debug tines/debug tchem/debug
   
   
   ```
