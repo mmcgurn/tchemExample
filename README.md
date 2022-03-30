@@ -10,11 +10,11 @@
 
   ```bash
   
-  module purge; module load chrest/ccr intel-mpi/2020.2 intel/20.2 cmake/3.17.1 yaml-cpp gtest openblas/release kokkos/release tines/release tchem/release
+  module purge; module load chrest/ccr intel-mpi/2019.5 cmake/3.17.1 yaml-cpp gtest openblas/release kokkos/release tines/release tchem/release
   
   or
   
-  module purge; module load chrest/ccr intel-mpi/2020.2 intel/20.2 cmake/3.17.1 yaml-cpp gtest openblas/debug kokkos/debug tines/debug tchem/debug
+  module purge; module load chrest/debug 
   
   
   ```
@@ -43,8 +43,7 @@
   
   or
   
-  module purge; module load chrest/ccr yaml-cpp gtest openblas/debug kokkos/debug tines/debug tchem/debug
-  
+  module purge; module load chrest/debug   
   
   ```
 
@@ -56,12 +55,13 @@
 
 5. Setup/build exe
    ```bash
-   module load cmake 
    
    mkdir tchemExampleBuild
    cd tchemExampleBuild
    
    cmake -B . -S ../tchemExample -DTChem_DIR=$TCHEM_DIR/lib64/cmake/TChem -DTines_DIR=$TINES_DIR/lib64/cmake/Tines -DKokkos_DIR=$KOKKOS_DIR/lib64/cmake/Kokkos
+   
+   make -j 8
    ``` 
      
 6. Running the example
