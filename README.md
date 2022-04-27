@@ -72,5 +72,5 @@
    ./exe --inputs-path=$TCHEM_DIR/example/data/ignition-zero-d/gri3.0/ --use-prefix-path=true
    
    # using custom yaml
-   ./exe  --yamlFile=../tchemExample/inputs/LL2KGB_AllRange.yaml --samplefile=../tchemExample/inputs/sample.dat
+   ./exe --useYaml=true --chemfile=../tchemExample/inputs/LL2KGB_AllRange.yaml --samplefile=../tchemExample/inputs/sample.dat
    ```
